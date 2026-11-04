@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>RunescapeOS</title>
+  <meta name="description" content="An Old School RuneScape-style life tracker.">
+  <meta name="theme-color" content="#1a1612">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Pixelify+Sans:wght@500;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>Runescape<span>OS</span></h1>
+    <div class="tot"><small>Total level</small><b id="hdr-total" class="num">23</b></div>
+  </header>
+  <main id="view" tabindex="-1"></main>
+</div>
+<nav class="nav" aria-label="Sections"><div class="nav-in" id="nav"></div></nav>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="sheet" class="sheet" hidden>
+  <div class="sheet-bg" data-act="sheet-close"></div>
+  <section class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <button class="x" id="sheet-x" data-act="sheet-close" aria-label="Close">&times;</button>
+    <div id="sheet-top"></div>
+    <div class="bonus">
+      <label class="dim" for="bonus-amt">Bonus XP (manual award or correction)</label>
+      <div class="row">
+        <input id="bonus-amt" type="number" inputmode="numeric" min="1" max="1000000" value="50">
+        <button class="btn primary" data-act="bonus-add">Add</button>
+        <button class="btn" data-act="bonus-sub">Remove</button>
+      </div>
+    </div>
+    <h3 class="sect">Training this skill</h3>
+    <div id="sheet-tasks"></div>
+  </section>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  // Offline support + "Install app" in Chrome. Needs https:// or localhost.
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+  // Ask the browser not to clear saved progress when storage runs low.
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+</script>
+</body>
+</html>
