@@ -32,9 +32,10 @@
   var CAT_LABEL = { combat: 'Combat', gathering: 'Gathering', artisan: 'Artisan', support: 'Support' };
   var MAX_TOTAL = 2277;
 
-  var TASK_DIFF = { easy: { label: 'Easy', xp: 15 }, medium: { label: 'Medium', xp: 35 }, hard: { label: 'Hard', xp: 60 }, elite: { label: 'Elite', xp: 100 } };
-  var QUEST_DIFF = { novice: { label: 'Novice', xp: 150, qp: 1 }, intermediate: { label: 'Intermediate', xp: 350, qp: 2 }, experienced: { label: 'Experienced', xp: 600, qp: 3 }, master: { label: 'Master', xp: 1000, qp: 5 } };
-  var BOSS_DIFF = { easy: { label: 'Easy', xp: 150 }, medium: { label: 'Medium', xp: 250 }, hard: { label: 'Hard', xp: 500 }, nightmare: { label: 'Nightmare', xp: 1000 } };
+  // XP rewards (v2: 4x the original rates). Changing these re-values everything already logged.
+  var TASK_DIFF = { easy: { label: 'Easy', xp: 60 }, medium: { label: 'Medium', xp: 140 }, hard: { label: 'Hard', xp: 240 }, elite: { label: 'Elite', xp: 400 } };
+  var QUEST_DIFF = { novice: { label: 'Novice', xp: 600, qp: 1 }, intermediate: { label: 'Intermediate', xp: 1400, qp: 2 }, experienced: { label: 'Experienced', xp: 2400, qp: 3 }, master: { label: 'Master', xp: 4000, qp: 5 } };
+  var BOSS_DIFF = { easy: { label: 'Easy', xp: 600 }, medium: { label: 'Medium', xp: 1000 }, hard: { label: 'Hard', xp: 2000 }, nightmare: { label: 'Nightmare', xp: 4000 } };
   function tier(map, key) { return Object.keys(map).indexOf(key); }
 
   var SEED_TASKS = [
@@ -119,7 +120,7 @@
       qp += QUEST_DIFF[q.diff].qp;
       if (per[q.skill]) per[q.skill].quests += QUEST_DIFF[q.diff].xp;
     });
-    s.bosses.forEach(function (b) { if (b.left <= 0 && per[b.skill]) per[b.skill].bosses += b.xp; });
+    s.bosses.forEach(function (b) { if (b.left <= 0 && per[b.skill]) per[b.skill].bosses += BOSS_DIFF[b.diff].xp; });
     SKILLS.forEach(function (k) {
       var p = per[k.name];
       p.total = p.bonus + p.tasks + p.quests + p.bosses;
@@ -405,7 +406,7 @@
       return '<article class="panel card' + (won ? ' won' : '') + '"><div class="hd"><h3>' + esc(b.title) + '</h3>' + chip(BOSS_DIFF, b.diff) + '</div>' +
         (b.desc ? '<p class="dim">' + esc(b.desc) + '</p>' : '') +
         '<div class="bar-x ' + (won ? 'done' : 'hp') + '" role="img" aria-label="' + b.left + ' of ' + b.hp + ' HP left"><i style="width:' + (won ? 100 : Math.round(b.left / b.hp * 100)) + '%"></i></div>' +
-        '<div class="meta num">' + (won ? 'Defeated' : b.left + ' / ' + b.hp + ' HP') + ' · +' + fmt(b.xp) + ' XP' + (b.skill ? ' to ' + b.skill : ' (no skill linked)') + '</div>' +
+        '<div class="meta num">' + (won ? 'Defeated' : b.left + ' / ' + b.hp + ' HP') + ' · +' + fmt(BOSS_DIFF[b.diff].xp) + ' XP' + (b.skill ? ' to ' + b.skill : ' (no skill linked)') + '</div>' +
         '<div class="row">' + (won ? '<button class="btn" data-act="boss-reset" data-id="' + esc(b.id) + '">Revive</button>' :
           '<button class="btn primary" data-act="boss-hit" data-id="' + esc(b.id) + '">Land a hit</button><button class="btn" data-act="boss-undo" data-id="' + esc(b.id) + '"' + (b.left >= b.hp ? ' disabled' : '') + '>Undo hit</button>') +
         (manage ? '<button class="btn danger" data-act="del" data-kind="boss" data-id="' + esc(b.id) + '">' + (pendingDel === key ? 'Tap again to remove' : 'Remove') + '</button>' : '') + '</div></article>';
@@ -454,7 +455,7 @@
       case 'tally-dec': t = find(state.tasks, id); if (!t || !t.tally) break; t.tally--; commit('−' + TASK_DIFF[t.diff].xp + ' XP · ' + t.skill); break;
       case 'quest-status': q = find(state.quests, id); if (!q || q.status === el.dataset.status) break; q.status = el.dataset.status;
         commit(q.status === 'done' ? 'Quest complete · +' + QUEST_DIFF[q.diff].xp + ' XP · +' + QUEST_DIFF[q.diff].qp + ' QP' : 'Quest updated'); break;
-      case 'boss-hit': b = find(state.bosses, id); if (!b || b.left <= 0) break; b.left--; commit(b.left <= 0 ? 'Boss defeated · +' + fmt(b.xp) + ' XP' : 'Hit landed · ' + b.left + ' HP left'); break;
+      case 'boss-hit': b = find(state.bosses, id); if (!b || b.left <= 0) break; b.left--; commit(b.left <= 0 ? 'Boss defeated · +' + fmt(BOSS_DIFF[b.diff].xp) + ' XP' : 'Hit landed · ' + b.left + ' HP left'); break;
       case 'boss-undo': b = find(state.bosses, id); if (!b || b.left >= b.hp) break; b.left++; commit(); break;
       case 'boss-reset': b = find(state.bosses, id); if (!b) break; b.left = b.hp; commit('Boss revived'); break;
       case 'del': {
