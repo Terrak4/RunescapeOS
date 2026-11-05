@@ -17,9 +17,9 @@ It's a plain web app (HTML, CSS and JavaScript). There's no build step and nothi
 
 ### Common edits in `js/app.js`
 
-- **XP per task difficulty**: `TASK_DIFF` (Easy 15, Medium 35, Hard 60, Elite 100)
-- **Quest XP and quest points**: `QUEST_DIFF`
-- **Boss XP**: `BOSS_DIFF`
+- **XP per task difficulty**: `TASK_DIFF` (Easy 60, Medium 140, Hard 240, Elite 400)
+- **Quest XP and quest points**: `QUEST_DIFF` (Novice 600 / 1 QP, Intermediate 1,400 / 2, Experienced 2,400 / 3, Master 4,000 / 5)
+- **Boss XP**: `BOSS_DIFF` (Easy 600, Medium 1,000, Hard 2,000, Nightmare 4,000)
 - **Starter tasks**: `SEED_TASKS`. These only apply on first launch or after clearing data.
 - **Starter quests and bosses**: `defaultState()`
 - **Rank titles**: `rankFor()`

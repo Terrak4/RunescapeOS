@@ -1,10 +1,11 @@
 // RunescapeOS service worker: keeps the app working offline.
 // After you change any file, bump VERSION so phones pick up the new copy.
-const VERSION = 'runescapeos-v1';
+const VERSION = 'runescapeos-v2';
 const SHELL = ['./', 'index.html', 'css/styles.css', 'js/app.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // cache: 'reload' skips the browser's HTTP cache so a new version never stores old files.
+  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
@@ -24,7 +25,8 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   if (url.origin !== location.origin) return;
-  e.respondWith(fetch(req).then((res) => {
+  // cache: 'no-cache' asks the server whether a file changed, so uploads show up right away.
+  e.respondWith(fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }).then((res) => {
     const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); return res;
   }).catch(() => caches.match(req).then((hit) => hit || caches.match('index.html'))));
 });
